@@ -1,0 +1,52 @@
+ <!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+ </head>
+	<body>
+	 	<div style="padding-top: 2.8em">
+		 	<div class="container">
+			 	<form method='post' action='upload.php' enctype="multipart/form-data">
+					<div class="form-group">
+				    	Input String: <input type='text' name='string' maxlength="128">
+					</div>
+					<div class="form-group">
+						Select File: <input type='file' name='filename' accept='.txt'
+						size='10'class="form-control-file">
+					 </div>
+				  	<button type="submit" class="btn btn-primary btn-block">Load Input</button>
+					<div style="padding-top: 2em"class="form-group">
+						<button name='del_db' type="submit" class="btn btn-danger btn-block">Erase Table</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</body>
+</html>
+  <!-- </tbody>
+</table>
+	</div>
+ </body>
+ </html> -->
+
+ <!-- // echo <<< _end
+// <!DOCTYPE html>
+// <html>
+// <head>
+// 	<title>Input Acceptor</title>
+// </head>
+// <body>
+// 	<form method='post' action='upload.php' enctype="multipart/form-data">
+// 		Input String: <input type='text' name='string' maxlength="128"><br><br>
+// 		Select File: <input type='file' name='filename' accept='.txt' size='10'><br>
+// 		<input type='submit' value='Load Input'>
+// 	</form>
+// </body>
+// </html>
+// _end; -->
+
