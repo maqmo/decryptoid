@@ -1,19 +1,20 @@
 <?php
-session_start();
-if (!empty($_SESSION['username'])){
-	$username = $_SESSION['username'];
-	$password = $_SESSION['password'];
-	$forenmae = $_SESSION['forename'];
-	$forenmae = $_SESSION['surname'];
+// session_start();
+// if (!empty($_SESSION['username'])){
+// 	$username = $_SESSION['username'];
+// 	$password = $_SESSION['password'];
+// 	$forename = $_SESSION['forename'];
+// 	$surname = $_SESSION['surname'];
+// 	//create the cookie here?
+// 	destroy_session_and_data();
+// 	echo $username, "<br>", $forename, "<br>", $surname;
+// 	header("Location:upload.php");
+// }else echo "Please <a href='authenticate.php'>LOG IN</a>";
 
-	destroy_session_and_data();
-	header("Location:upload.php");
-}else echo "Please <a href='authenticate.php'>LOG IN</a>";
+// function destroy_session_and_data(){
 
-function_destroy_session_and_data(){
-	$_SESSION = array();
-	setcookie(session_name(),'',time()-2592000, '/')
-	session_destroy();
-}
+// 	setcookie(session_name(),'',time()-2592000, '/');
+// 	session_destroy();
+// }
 
 ?>

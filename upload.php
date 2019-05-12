@@ -1,8 +1,35 @@
 <?php
 require_once "login.php";
-require_once "markup.html";
+require_once "sanitize.php";
 
 $table_disp = 0;
+if(!empty($_COOKIE['username'])){
+    echo "cookie is set: {$_COOKIE['username']}";
+}
+session_start();
+if (empty($_SESSION['username'])){
+    echo <<< _login
+    <a href="authenticate.php"><h3>havent logged in yet</h3></a>
+_login;
+}else{
+    $username = $_SESSION['username'];
+    $password = $_SESSION['password'];
+    $forename = $_SESSION['forename'];
+    $surname = $_SESSION['surname'];
+    //86400 = 1 day
+    setcookie('username',$username,time()+(86400*7),'/');
+    header("Locaiton:upload.php");
+    destroy_session_and_data();
+    echo <<< _logged
+    <h3>hello, {$forename}, you're logged in as
+    "{$_SESSION['username']}"</h3>
+_logged;
+
+
+}
+
+require_once "markup.html";
+//$user = $_SESSION['username'];
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
 
@@ -12,13 +39,6 @@ if ($_FILES && $_FILES['filename']['name']){
     $type = $_FILES['filename']['type'];
     $err = $_FILES['filename']['error'];
     $size = $_FILES['filename']['size'];
-//     echo <<< end
-//     the name  is: {$name} <br>
-//     the temp name is : {$t_name} <br>
-//     the type is : {$type} <br>
-//     the error code is: {$err} <br>
-//     the size is: {$size} <br>
-// end;
 
     $name = strtolower(preg_replace("[^A-Za-z0-9.]", "", $name));
     if ($size > 1000000) die("Input file is too large");
@@ -60,25 +80,20 @@ function table_query($query, $connection){
     return $data;
 }
 
-function sanitizeInputs($str){
-    $str = stripslashes($str);
-    $str = strip_tags($str);
-    $str = htmlentities($str);
-    return $str;
-}
-
 function table_print($conn){
-    $result = table_query("SELECT * FROM input;",$conn);
+    // $result = table_query("SELECT * FROM input WHERE username = '{$user};'",$conn);
+    $result = table_query("SELECT * FROM input",$conn);
     $rows = $result->num_rows;
     echo <<< _b
-    <table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Input Type</th>
-            <th scope="col">String Value</th>
-        </tr>
-    </thead>
-        <tr>
+    <div class=jumbotron>
+        <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Input Type</th>
+                <th scope="col">String Value</th>
+            </tr>
+        </thead>
+            <tr>
 _b;
     while ($row = $result->fetch_assoc()){
         foreach ($row as $field => $value){
@@ -91,6 +106,7 @@ _b;
     echo <<< _e
         </tbody>
     </table>
+    </div>
 _e;
 }
 
@@ -108,5 +124,15 @@ function handleError($errCode){
         return;
     }
     die($errorCodes[$errCode]);
+}
+function destroy_session_and_data(){
+
+    setcookie(session_name(),'',time()-2592000, '/');
+    session_destroy();
+}
+
+function logout($username){
+    setcookie('username',$username,time()-2592000,'/');
+    session_destroy();
 }
 ?>
