@@ -12,12 +12,13 @@ if (!empty($_POST['username']) && !empty($_POST['password1'])){
 	if (!validate_then_sessionize($conn,$un_temp,$pw_temp))
 		die("Invalid username/password");
 	else
-		header("Location: upload.php");
+		header("Location: continue.php");
 }
 echo <<< _i
 	<a href="setupusers.php"><h1>...or create an account here</h1></a>
 _i;
 $conn->close();
+
 function validate_then_sessionize($conn, $un, $pw){
 	$salt = "qwe*&^";
 	$query = "SELECT * FROM users WHERE username='$un'";

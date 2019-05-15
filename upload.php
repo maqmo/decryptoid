@@ -1,30 +1,25 @@
 <?php
 require_once "login.php";
 require_once "sanitize.php";
+require_once "markup.html";
 
 $table_disp = 0;
-if(!empty($_COOKIE['username'])){
-    echo "cookie is set: {$_COOKIE['username']}";
-}
+$username = 0;
+if (!empty($_COOKIE['username']))
+    $username =($_COOKIE['username']);
 session_start();
-if (empty($_SESSION['username'])){
+if (empty($_SESSION['username']) && !$username){
     echo <<< _login
-    <a href="authenticate.php"><h3>havent logged in yet</h3></a>
+    <a style="text-align:right" href="authenticate.php"><h1>sign in</h1></a>
 _login;
 }else{
-    $username = $_SESSION['username'];
-    $password = $_SESSION['password'];
     $forename = $_SESSION['forename'];
     $surname = $_SESSION['surname'];
-    //86400 = 1 day
-    setcookie('username',$username,time()+(86400*7),'/');
-    header("Locaiton:upload.php");
-    destroy_session_and_data();
     echo <<< _logged
     <h3>hello, {$forename}, you're logged in as
     "{$_SESSION['username']}"</h3>
+    <a href="logout.php" style="text-align:right" href="authenticate.php"><h1>sign out</h1></a>
 _logged;
-
 
 }
 
@@ -46,9 +41,8 @@ if ($_FILES && $_FILES['filename']['name']){
     if (!move_uploaded_file($t_name, $name)){
         die("Could Not Move File To Current Directory");
     }
-    $content =  sanitizeInputs(file_get_contents($name));
-    // escape quotes
     $content = addslashes($content);
+    $content =  sanitizeInputs(file_get_contents($name));
     $query = "INSERT INTO input(file_input) values('{$content}')";
 	table_query($query, $conn);
 	table_print($conn);
@@ -68,6 +62,11 @@ if (isset($_POST['string']) && $_POST['string'] !== "") {
 if(isset($_POST['del_db'])){
     $query = "TRUNCATE input;";
     table_query($query, $conn);
+}
+
+if (!empty($_POST['logout'])){
+    logout();
+    die(header("Location:upload.php"));
 }
 
 if($table_disp === 0){
@@ -125,14 +124,26 @@ function handleError($errCode){
     }
     die($errorCodes[$errCode]);
 }
-function destroy_session_and_data(){
+echo <<< _body
+    <div style="padding-top: 2.8em">
+        <div class="container">
+            <form method='post' action='upload.php' enctype="multipart/form-data">
+                <div class="form-group">
+                    Input String:<br> <input type='text' name='string' maxlength="128">
+                </div>
+                <div class="form-group">
+                    Upload Text File: <input type='file' name='filename' accept='.txt'
+                    size='10'class="form-control-file">
+                 </div>
+                <button type="submit" class="btn btn-primary btn-block">Load Input</button>
+                <div style="padding-top: 2.0em"class="form-group">
+                    <button name='del_db' type="submit" class="btn btn-danger btn-block">Erase Table</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    </body>
+</html>
 
-    setcookie(session_name(),'',time()-2592000, '/');
-    session_destroy();
-}
-
-function logout($username){
-    setcookie('username',$username,time()-2592000,'/');
-    session_destroy();
-}
+_body
 ?>
