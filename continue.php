@@ -1,4 +1,5 @@
 <?php
+require_once "markup.html";
 session_start();
 if (!empty($_SESSION['username'])){
 	$username = $_SESSION['username'];
@@ -6,6 +7,10 @@ if (!empty($_SESSION['username'])){
     setcookie('username',$username,time()+(86400*7),'/');
     header("Locaiton:upload.php");
 	header("Location:upload.php");
-}else echo "Please <a href='authenticate.php'>LOG IN</a>";
+}else {
+	// echo "<a href='authenticate.php'>UNRECOGNIZED CREDENTIALS, CREATE AN ACCOUNT IF NEEDED</a>";
+	header("Location:authenticate.php");
+	echo "a;lsdkfjalsd;kjfl;aksdfj;lasdkfjl;asdjf;las";
+}
 
 ?>

@@ -2,28 +2,49 @@
 require_once "login.php";
 require_once "sanitize.php";
 require_once "markup.html";
+require_once "encrypt.php";
 
 $table_disp = 0;
 $username = 0;
+$cipher = "";
 if (!empty($_COOKIE['username']))
     $username =($_COOKIE['username']);
 session_start();
 if (empty($_SESSION['username']) && !$username){
-    echo <<< _login
-    <a style="text-align:right" href="authenticate.php"><h1>sign in</h1></a>
-_login;
+    echo "<marquee scrollamount='1' behavior='alternate'><a href=\"authenticate.php\"> <h2>...you can sign in here</h2></a></marquee>";
 }else{
     $forename = $_SESSION['forename'];
     $surname = $_SESSION['surname'];
     echo <<< _logged
-    <h3>hello, {$forename}, you're logged in as
+    <h3 class=text-secondarym>hello, {$forename}, you're logged in as
     "{$_SESSION['username']}"</h3>
-    <a href="logout.php" style="text-align:right" href="authenticate.php"><h1>sign out</h1></a>
+    <a href="logout.php" style="text-align:right" href="authenticate.php"><h1>sign out</h1></a>;
 _logged;
 
 }
 
 require_once "markup.html";
+echo <<< _body
+        <div class="container">
+            <form method='post' action='upload.php' enctype="multipart/form-data">
+                <div class="form-group">
+                    Enter a string, or upload a text file:<br> <input type='text' name='string' maxlength="128">
+                </div>
+                <div class="form-group">
+                    <input type='file' name='filename' accept='.txt'
+                    class="form-control-file">
+                 </div>
+                <button type="submit" class="btn btn-primary btn-block">Load Input</button>
+                <div style="padding-top: 2.0em"class="form-group">
+                    <button name='del_db' type="submit" class="btn btn-danger btn-block">Erase Table</button>
+                    <div style="padding-top: 2.0em"class="form-group">
+                    <button name='del_db' type="submit" class="btn btn-warning btn-block">Load Model</button>
+            </form>
+        </div>
+    </body>
+</html>
+
+_body;
 //$user = $_SESSION['username'];
 $conn = new mysqli($hn, $un, $pw, $db);
 if ($conn->connect_error) die($conn->connect_error);
@@ -69,6 +90,11 @@ if (!empty($_POST['logout'])){
     die(header("Location:upload.php"));
 }
 
+if (!empty($_POST['cipher'])){
+    $cipher = $_POST['cipher'];
+    echo "cipher chosen was $cipher";
+}
+
 if($table_disp === 0){
     table_print($conn);
 }
@@ -83,30 +109,33 @@ function table_print($conn){
     // $result = table_query("SELECT * FROM input WHERE username = '{$user};'",$conn);
     $result = table_query("SELECT * FROM input",$conn);
     $rows = $result->num_rows;
-    echo <<< _b
-    <div class=jumbotron>
-        <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th scope="col">Input Type</th>
-                <th scope="col">String Value</th>
-            </tr>
-        </thead>
-            <tr>
+    if ($rows > 0){
+        echo <<< _b
+        <div class=jumbotron>
+            <h1 class=display-5> Your information entered</h3>
+            <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Input Type</th>
+                    <th scope="col">String Value</th>
+                </tr>
+            </thead>
+                <tr>
 _b;
-    while ($row = $result->fetch_assoc()){
-        foreach ($row as $field => $value){
-            if ($value){
-                $field = explode("_", $field);
-                echo "<td><em>{$field[0]}</em></td><td> $value </td></tr>";
+        while ($row = $result->fetch_assoc()){
+            foreach ($row as $field => $value){
+                if ($value){
+                    $field = explode("_", $field);
+                    echo "<td><em>{$field[0]}</em></td><td> $value </td></tr>";
+                }
             }
         }
-    }
-    echo <<< _e
-        </tbody>
-    </table>
-    </div>
+        echo <<< _e
+            </tbody>
+        </table>
+        </div>
 _e;
+    }
 }
 
 function handleError($errCode){
@@ -124,26 +153,4 @@ function handleError($errCode){
     }
     die($errorCodes[$errCode]);
 }
-echo <<< _body
-    <div style="padding-top: 2.8em">
-        <div class="container">
-            <form method='post' action='upload.php' enctype="multipart/form-data">
-                <div class="form-group">
-                    Input String:<br> <input type='text' name='string' maxlength="128">
-                </div>
-                <div class="form-group">
-                    Upload Text File: <input type='file' name='filename' accept='.txt'
-                    size='10'class="form-control-file">
-                 </div>
-                <button type="submit" class="btn btn-primary btn-block">Load Input</button>
-                <div style="padding-top: 2.0em"class="form-group">
-                    <button name='del_db' type="submit" class="btn btn-danger btn-block">Erase Table</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    </body>
-</html>
-
-_body
 ?>
